@@ -1,0 +1,27 @@
+html, body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #F3F3F3;
+}
+
+.container {
+    height: 100vh;
+    margin-bottom: 30vh;
+}
+
+.nav {
+    height: 10vh;
+    display: flex;
+    align-items: center;
+}
+
+.card {
+    border: 1px solid white;
+}
+
+.card:hover {
+    border: 1px solid rgba(0, 0, 0, .235);
+    border-radius: .25rem;
+    cursor: pointer;
+}
