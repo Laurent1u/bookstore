@@ -7,15 +7,16 @@
         ?>
         <form method="post" action="#">
             <input type="hidden" name="doAction" value="">
+            <input type="hidden" name="book_id" value="<?php echo $bookId; ?>">
             <div class="form-group">
                 <label for="book_name">Nume Carte</label>
-                <input type="text" class="form-control" name="book_name" id="book_name" placeholder="Nume Carte">
+                <input type="text" class="form-control" name="book_name" id="book_name" placeholder="Nume Carte" value="<?php echo ($list[0]->name ?? null); ?>">
             </div>
             <div class="form-group">
                 <label for="author_id">Autor</label>
                 <select multiple class="form-control" name="author_id[]" id="author_id">
-                    <?php foreach ($authorList as $author) { ?>
-                        <option value="<?php echo $author->id; ?>"><?php echo $author->name; ?></option>
+                    <?php foreach ($authorList as $key => $author) { ?>
+                        <option value="<?php echo $author->id; ?>" <?php echo ($author->id == $getBookAuthor[$author->id] ? ' selected' : '') ?>><?php echo $author->name; ?></option>
                     <?php } ?>
                 </select>
                 <span class="text-secondary small">Pentru selectarea mai multor autori tineti apasata tasta CTRL in timp ce selectati autorul dorit</span>
@@ -25,32 +26,32 @@
                 <select class="form-control" name="publisher" id="publisher">
                     <option value="">TOT</option>
                     <?php foreach ($publisherList as $publisher) { ?>
-                        <option value="<?php echo $publisher->id; ?>"><?php echo $publisher->name; ?></option>
+                        <option value="<?php echo $publisher->id; ?>" <?php echo ($publisher->id == $list[0]->publisher_id ? ' selected' : ''); ?>><?php echo $publisher->name; ?></option>
                     <?php } ?>
                 </select>
             </div>
             <div class="form-group">
                 <label for="appearance_date">Data Aparitie</label>
-                <input type="text" class="form-control datepicker" name="appearance_date" id="appearance_date" placeholder="Exemplu <?php echo date('Y-m-d'); ?>" autocomplete="off">
+                <input type="text" class="form-control datepicker" name="appearance_date" id="appearance_date" value="<?php echo $list[0]->appearance_date; ?>" autocomplete="off">
                 <div class="input-group-addon">
                     <span class="glyphicon glyphicon-th"></span>
                 </div>
             </div>
             <div class="form-group">
                 <label for="page_number">Numar Pagini</label>
-                <input type="text" class="form-control" name="page_number" id="page_number" placeholder="0">
+                <input type="text" class="form-control" name="page_number" id="page_number" value="<?php echo $list[0]->page_number; ?>" placeholder="0">
             </div>
             <div class="form-group">
                 <label for="price">Pret</label>
-                <input type="text" class="form-control" name="price" id="price" placeholder="0.00">
+                <input type="text" class="form-control" name="price" id="price" value="<?php echo $list[0]->price; ?>" placeholder="0.00">
             </div>
             <div class="form-group">
                 <label for="bar_code">Cod De Bare</label>
-                <input type="text" class="form-control" name="bar_code" id="bar_code" placeholder="12345678">
+                <input type="text" class="form-control" name="bar_code" id="bar_code" value="<?php echo $list[0]->bar_code; ?>" placeholder="12345678">
             </div>
             <div class="form-group">
                 <label for="description">Descriere</label>
-                <textarea class="form-control" name="description" id="description" rows="3"></textarea>
+                <textarea class="form-control" name="description" id="description" rows="3"><?php echo $list[0]->description; ?></textarea>
             </div>
             <button type="submit" class="btn btn-secondary btn-sm">Salveaza</button>
         </form>

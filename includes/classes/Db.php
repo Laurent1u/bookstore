@@ -123,7 +123,6 @@ class Db
             $x++;
         }
         $sql = "update {$table} set {$set} where id = {$id}";
-
         if (!$this->query($sql, $fields)->error()) {
             return true;
         }

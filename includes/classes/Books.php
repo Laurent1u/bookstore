@@ -21,19 +21,20 @@ class Books
 
     public function delete($fields)
     {
-        if (!$this->_db->delete('author', $fields)) {
-            throw new Exception('Autorul nu a putut fi sters sau nu exista !');
+        if (!$this->_db->delete('books', $fields)) {
+            throw new Exception('Cartea nu a putut fi stersa sau nu exista !');
         }
-        return 'Autorul a fost sters';
+        return (object)['message' => 'Cartea a fost sters'];
     }
 
     public function update($fields = array(), $id = null)
     {
         if (is_int($id)) {
-            if (!$this->_db->update('author', $id, $fields)) {
-                throw new Exception('Autorul nu a putut fi modificat !');
+            if (!$this->_db->update('books', $id, $fields)) {
+                throw new Exception('Cartea nu a putut fi modificat !');
             }
-            return 'Autorul a fost modificat !';
+            $this->_db->delete('authors_books', array('book_id', '=', $id));
+            return (object)['message' => 'Cartea a fost modificata !'];
         }
     }
 
@@ -46,15 +47,23 @@ class Books
         return false;
     }
 
-    public function getBooks()
+    public function getBooks($filters = array())
     {
-        $sql = "select b.*, group_concat(a.name separator ' / ') as authors_name,
-                p.name as publisher
-                from books b 
-                inner join authors_books ab on ab.book_id = b.id
-                inner join author a on a.id = ab.author_id
-                inner join publishers p on p.id = b.publisher_id
-                group by b.id";
+        $sql = "select b.*, group_concat(a.name separator ' / ') as authors_name, group_concat(a.id) as author_id,
+                p.name as publisher"
+                . " from books b"
+                . " inner join authors_books ab on ab.book_id = b.id"
+                . " inner join author a on a.id = ab.author_id"
+                . " inner join publishers p on p.id = b.publisher_id"
+                . " where 1"
+                . ($filters->author ? " and a.id = '" . $filters->author . "'" : '')
+                . ($filters->publisher ? " and p.id = '" . $filters->publisher . "'" : '')
+                . ($filters->dateStart ? " and b.appearance_date >= '" . $filters->dateStart . "'" : '')
+                . ($filters->dateEnd ? " and b.appearance_date <= '" . $filters->dateEnd . "'" : '')
+                . ($filters->id ? " and b.id = '" . $filters->id . "'" : '')
+                . " group by b.id";
+        //print_r($sql);
+        //die;
         $data = $this->_db->query($sql);
         if ($data->count()) {
             $this->_data = $data->results();

@@ -1,5 +1,7 @@
 <?php
+$bookId = $requestParam->_int('book_id');
 $result = null;
+$getBookAuthor = null;
 
 $params = array(
     'location' => 'http://localhost/bookstore/includes/classes/Books.php',
@@ -35,7 +37,17 @@ switch ($doAction) {
 
         if (!empty($bookName) && !empty($appearanceDate) && !empty($price)) {
             try {
-                $response = $soapClient->__soapCall('create', array($bookArray));
+                if ($bookId) {
+                    $response = $soapClient->__soapCall('update', array($bookArray, $bookId));
+                    $bookAuthorArray = array();
+                    foreach ($authorArrayIds as $author_id) {
+                        $bookAuthorArray['book_id'] = $bookId;
+                        $bookAuthorArray['author_id'] = $author_id;
+                        $soapClient->__soapCall('create', array($bookAuthorArray, 'authors_books'));
+                    }
+                } else {
+                    $response = $soapClient->__soapCall('create', array($bookArray));
+                }
                 $result = $response->message;
 
                 if ($response->last_insert_id) {
@@ -51,17 +63,17 @@ switch ($doAction) {
                 print_r($soapClient->__getLastResponse());
             }
         }
-
-        /*echo '<pre>';
-        print_r($authorArrayIds);
-        print_r($bookArray);
-
-        die();*/
         break;
 }
 
 try {
-    $list = $soapClient->__soapCall('getBooks', array());
+    $params = ['id' => $bookId];
+
+    if ($bookId) {
+        $list = $soapClient->__soapCall('getBooks', array((object)$params));
+        $getBookAuthor = explode(',', $list[0]->author_id);
+        $getBookAuthor = array_combine($getBookAuthor, $getBookAuthor);
+    }
     $authorList = $soapClient->__soapCall('getAuthors', array());
     $publisherList = $soapClient->__soapCall('getPublisher', array());
     //print_r($list);
