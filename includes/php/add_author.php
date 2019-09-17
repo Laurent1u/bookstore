@@ -38,7 +38,6 @@ switch ($doAction) {
         if (is_int($authorId)) {
             try {
                 $result = $soapClient->__soapCall('delete', array(array('id', '=', $authorId)));
-                header('Location: ?p=add_author');
             } catch (Exception $e) {
                 print_r($e->getMessage());
                 echo '<pre>';

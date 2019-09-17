@@ -25,7 +25,7 @@ switch ($doAction) {
 
         $bookArray = array(
             'name' => $bookName,
-            'publisher' => $publisher,
+            'publisher_id' => $publisher,
             'appearance_date' => $appearanceDate,
             'page_number' => $pageNumber,
             'bar_code' => $barCode,

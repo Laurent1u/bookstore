@@ -18,6 +18,7 @@
                         <option value="<?php echo $author->id; ?>"><?php echo $author->name; ?></option>
                     <?php } ?>
                 </select>
+                <span class="text-secondary small">Pentru selectarea mai multor autori tineti apasata tasta CTRL in timp ce selectati autorul dorit</span>
             </div>
             <div class="form-group">
                 <label for="publisher">Editura</label>
@@ -30,17 +31,17 @@
             </div>
             <div class="form-group">
                 <label for="appearance_date">Data Aparitie</label>
-                <input type="text" class="form-control datepicker" name="appearance_date" id="appearance_date" placeholder="Exemplu <?php echo date('Y-m-d'); ?>">
+                <input type="text" class="form-control datepicker" name="appearance_date" id="appearance_date" placeholder="Exemplu <?php echo date('Y-m-d'); ?>" autocomplete="off">
                 <div class="input-group-addon">
                     <span class="glyphicon glyphicon-th"></span>
                 </div>
             </div>
             <div class="form-group">
                 <label for="page_number">Numar Pagini</label>
-                <input type="number" class="form-control" name="page_number" id="page_number" placeholder="0">
+                <input type="text" class="form-control" name="page_number" id="page_number" placeholder="0">
             </div>
             <div class="form-group">
-                <label for="page_number">Pret</label>
+                <label for="price">Pret</label>
                 <input type="text" class="form-control" name="price" id="price" placeholder="0.00">
             </div>
             <div class="form-group">
@@ -69,8 +70,10 @@
 
         $('form').submit(function (e) {
             e.preventDefault();
+            message = [];
 
-            let foundError = false;
+            let validate = false;
+            let submitForm = true;
             let bookName = $('#book_name');
             let authorId = $('#author_id');
             let publisher = $('#publisher');
@@ -79,56 +82,26 @@
             let barCode = $('#bar_code');
             let price = $('#price');
 
-            if (isEmpty(bookName.val())) {
-                bookName.removeClass('is-valid').addClass('is-invalid');
-                foundError = true;
-            } else {
-                bookName.removeClass('is-invalid').addClass('is-valid');
-            }
-            if (isEmpty(authorId.val())) {
-                authorId.removeClass('is-valid').addClass('is-invalid');
-                foundError = true;
-            } else {
-                authorId.removeClass('is-invalid').addClass('is-valid');
-            }
-            if (isEmpty(publisher.val())) {
-                publisher.removeClass('is-valid').addClass('is-invalid');
-                foundError = true;
-            } else {
-                publisher.removeClass('is-invalid').addClass('is-valid');
-            }
-            if (isEmpty(appearanceDate.val())) {
-                appearanceDate.removeClass('is-valid').addClass('is-invalid');
-                foundError = true;
-            } else {
-                appearanceDate.removeClass('is-invalid').addClass('is-valid');
-            }
-            if (isEmpty(pageNumber.val())) {
-                pageNumber.removeClass('is-valid').addClass('is-invalid');
-                foundError = true;
-            } else {
-                pageNumber.removeClass('is-invalid').addClass('is-valid');
-            }
-            if (isEmpty(barCode.val()) || (!isEmpty(barCode.val()) && !parseInt(barCode.val()))) {
-                if (!isEmpty(barCode.val())  && !parseInt(barCode.val())) {
-                    alert('Codul de bare trebuie sa contina doar cifre')
-                }
-                barCode.removeClass('is-valid').addClass('is-invalid');
-                foundError = true;
-            } else {
-                barCode.removeClass('is-invalid').addClass('is-valid');
-            }
-            if (isEmpty(price.val()) || (!isEmpty(price.val())  && !parseInt(price.val()))) {
-                if (!isEmpty(price.val())  && !parseInt(price.val())) {
-                    alert('Pretul trebuie sa contina doar cifre')
-                }
-                price.removeClass('is-valid').addClass('is-invalid');
-                foundError = true;
-            } else {
-                price.removeClass('is-invalid').addClass('is-valid');
-            }
+            let requiredFields = [bookName, authorId, publisher, appearanceDate, pageNumber, price, barCode];
+            let intFields = [pageNumber, price, barCode];
 
-            if (foundError) {
+            requiredFields.forEach((field, index)=> {
+                let labelIdentifier = $('label[for="' + field[0].id + '"]').html();
+                validate = validateEmptyInput(field, labelIdentifier);
+                if (validate.isValid) {
+                    submitForm = false;
+                }
+            });
+            intFields.forEach((field, index) => {
+                let labelIdentifier = $('label[for="' + field[0].id + '"]').html();
+                validateIntInput(field, labelIdentifier);
+                if (validate.isValid) {
+                    submitForm = false;
+                }
+            });
+
+            if (!submitForm) {
+                alert(validate.message.join().replace(/,/gi, ''));
                 return false;
             }
 

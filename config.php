@@ -2,7 +2,7 @@
 define('HTTP_SERVER', 'http://localhost/bookstore/');
 define('DATABASE_NAME', 'bookstore');
 define('DATABASE_USER', 'root');
-define('DATABASE_PASSWORD', '');
+define('DATABASE_PASSWORD', 'root');
 define('SOAP_USERNAME', 'root');
 define('SOAP_PASSWORD', 'password');
 

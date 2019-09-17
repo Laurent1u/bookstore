@@ -47,18 +47,16 @@
     window.onload = function() {
         $('form').submit(function (e) {
             e.preventDefault();
+            message = [];
             let authorName = $('#author_name');
+            let authorLabel = $('label[for="' + authorName[0].id + '"]').html();
 
-            if (isEmpty(authorName.val())) {
-                authorName.removeClass('is-valid').addClass('is-invalid');
-                alert('Autorul este camp obligatoriu !');
-                return false;
-            } else if (authorName.val().length <= 4) {
-                authorName.removeClass('is-valid').addClass('is-invalid');
-                alert('Numele este prea scurt !');
+            validate = validateLengthInput(authorName, authorLabel, 4);
+
+            if (validate.isValid) {
+                alert(validate.message);
                 return false;
             }
-            authorName.removeClass('is-invalid').addClass('is-valid');
             this.elements['doAction'].value = 'save';
             this.submit();
         });
