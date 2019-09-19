@@ -30,6 +30,18 @@ spl_autoload_register(function ($class) {
     }
 });
 
+$params = array(
+    'location' => 'http://localhost/bookstore/includes/classes/ServerSoap.php',
+    'uri' => 'urn://localhost/bookstore/includes/classes/ServerSoap.php',
+    'trace' => 1
+);
+
+$authParam = ['username' => SOAP_USERNAME, 'password' => SOAP_PASSWORD];
+$soapVar = new SoapVar($authParam, SOAP_ENC_OBJECT);
+$soapHeader = new SoapHeader('bookstore', 'soapLogin', $soapVar, false);
+$soapClient = new SoapClient(null, $params);
+$soapClient->__setSoapHeaders([$soapHeader]);
+
 $requestParam = new Request();
 $page = $requestParam->_request('p');
 $doAction = $requestParam->_request('doAction');

@@ -23,6 +23,19 @@ class Request
         return $defaultValue;
     }
 
+    public function _bool($key, $defaultValue = ''){
+        if ($this->_isset($key)){
+            $requestValue = $_REQUEST[$key];
+
+            if ((is_numeric($requestValue) && !empty($requestValue)) || $requestValue == 'true') {
+                return true;
+            } elseif ((is_numeric($requestValue) && empty($requestValue)) || $requestValue == 'false') {
+                return false;
+            }
+        }
+        return $defaultValue;
+    }
+
     public function _double($key, $defaultValue = 0){
         if ($this->_isset($key)){
             return (double)$_REQUEST[$key];

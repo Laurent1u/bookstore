@@ -39,7 +39,7 @@
             </div>
             <div class="form-group">
                 <label for="page_number">Numar Pagini</label>
-                <input type="text" class="form-control" name="page_number" id="page_number" value="<?php echo $list[0]->page_number; ?>" placeholder="0">
+                <input type="text" class="form-control" name="page_number" id="page_number" value="<?php echo $list[0]->page_number; ?>">
             </div>
             <div class="form-group">
                 <label for="price">Pret</label>
@@ -47,7 +47,7 @@
             </div>
             <div class="form-group">
                 <label for="bar_code">Cod De Bare</label>
-                <input type="text" class="form-control" name="bar_code" id="bar_code" value="<?php echo $list[0]->bar_code; ?>" placeholder="12345678">
+                <input type="text" class="form-control" name="bar_code" id="bar_code" value="<?php echo $list[0]->bar_code; ?>">
             </div>
             <div class="form-group">
                 <label for="description">Descriere</label>

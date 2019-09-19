@@ -1,17 +1,8 @@
 <?php
-include '../../config.php';
 
-class Books
+class Books extends Author
 {
-    private $_db,
-        $_data;
-
-    public function __construct()
-    {
-        $this->_db = Db::getInstance();
-    }
-
-    public function create($fields, $table = 'books')
+    public function createBook($fields, $table = 'books')
     {
         if (!$this->_db->insert($table, $fields)) {
             throw new Exception('Cartea nu a fost introdusa !');
@@ -19,7 +10,7 @@ class Books
         return (object)array('last_insert_id' => Db::getLastInsertId(), 'message' => 'Cartea a fost adaugata in biblioteca !');
     }
 
-    public function delete($fields)
+    public function deleteBook($fields)
     {
         if (!$this->_db->delete('books', $fields)) {
             throw new Exception('Cartea nu a putut fi stersa sau nu exista !');
@@ -27,29 +18,19 @@ class Books
         return (object)['message' => 'Cartea a fost sters'];
     }
 
-    public function update($fields = array(), $id = null)
+    public function updateBook($fields = array(), $id = null)
     {
         if (is_int($id)) {
             if (!$this->_db->update('books', $id, $fields)) {
                 throw new Exception('Cartea nu a putut fi modificat !');
             }
-            $this->_db->delete('authors_books', array('book_id', '=', $id));
             return (object)['message' => 'Cartea a fost modificata !'];
         }
     }
 
-    public function getAuthors()
-    {
-        $data = $this->_db->get('author', array('id', '>=', '1'));
-        if ($data->count()) {
-            return $data->results();
-        }
-        return false;
-    }
-
     public function getBooks($filters = array())
     {
-        $sql = "select b.*, group_concat(a.name separator ' / ') as authors_name, group_concat(a.id) as author_id,
+        $sql = "select b.*, b.name as book_name, group_concat(a.name separator ' / ') as authors_name, group_concat(a.id) as author_id,
                 p.name as publisher"
                 . " from books b"
                 . " inner join authors_books ab on ab.book_id = b.id"
@@ -58,41 +39,19 @@ class Books
                 . " where 1"
                 . ($filters->author ? " and a.id = '" . $filters->author . "'" : '')
                 . ($filters->publisher ? " and p.id = '" . $filters->publisher . "'" : '')
+                . ($filters->publishers ? " and p.id in ('" . $filters->publishers . "')" : '')
                 . ($filters->dateStart ? " and b.appearance_date >= '" . $filters->dateStart . "'" : '')
                 . ($filters->dateEnd ? " and b.appearance_date <= '" . $filters->dateEnd . "'" : '')
                 . ($filters->id ? " and b.id = '" . $filters->id . "'" : '')
+                . ($filters->loan === true ? " and b.is_loan = '1'" : '')
+                . ($filters->loan === false ? " and b.is_loan = '0'" : '')
                 . " group by b.id";
-        //print_r($sql);
-        //die;
+
         $data = $this->_db->query($sql);
         if ($data->count()) {
             $this->_data = $data->results();
             return $this->_data;
         }
-        return false;
-    }
-
-    public function getPublisher()
-    {
-        $data = $this->_db->get('publishers', array('id', '>=', '1'));
-        if ($data->count()) {
-            $this->_data = $data->results();
-            return $this->_data;
-        }
-        return false;
-    }
-
-    public function soapLogin($headerParamas = null)
-    {
-        if ($headerParamas->username == SOAP_USERNAME && $headerParamas->password == SOAP_PASSWORD) {
-            return true;
-        }
-        throw new SoapFault('Wrong username/password ', 401);
+        return [];
     }
 }
-
-$params = ['uri' => 'http://localhost/bookstore/includes/classes/Books.php'];
-$server = new SoapServer(null, $params);
-$server->setClass('Books');
-$server->addSoapHeader();
-$server->handle();

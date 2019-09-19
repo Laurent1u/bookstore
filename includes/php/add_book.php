@@ -3,17 +3,6 @@ $bookId = $requestParam->_int('book_id');
 $result = null;
 $getBookAuthor = null;
 
-$params = array(
-    'location' => 'http://localhost/bookstore/includes/classes/Books.php',
-    'uri' => 'urn://localhost/bookstore/includes/classes/Books.php',
-    'trace' => 1
-);
-$authParam = ['username' => SOAP_USERNAME, 'password' => SOAP_PASSWORD];
-$soapVar = new SoapVar($authParam, SOAP_ENC_OBJECT);
-$soapHeader = new SoapHeader('bookstore', 'soapLogin', $soapVar, false);
-$soapClient = new SoapClient(null, $params);
-$soapClient->__setSoapHeaders([$soapHeader]);
-
 switch ($doAction) {
     case 'save':
         $bookName = $requestParam->_post('book_name');
@@ -38,15 +27,17 @@ switch ($doAction) {
         if (!empty($bookName) && !empty($appearanceDate) && !empty($price)) {
             try {
                 if ($bookId) {
-                    $response = $soapClient->__soapCall('update', array($bookArray, $bookId));
+                    $response = $soapClient->__soapCall('updateBook', array($bookArray, $bookId));
+                    $soapClient->__soapCall('deleteAuthorsBooks', array($bookId));
+
                     $bookAuthorArray = array();
                     foreach ($authorArrayIds as $author_id) {
                         $bookAuthorArray['book_id'] = $bookId;
                         $bookAuthorArray['author_id'] = $author_id;
-                        $soapClient->__soapCall('create', array($bookAuthorArray, 'authors_books'));
+                        $soapClient->__soapCall('createBook', array($bookAuthorArray, 'authors_books'));
                     }
                 } else {
-                    $response = $soapClient->__soapCall('create', array($bookArray));
+                    $response = $soapClient->__soapCall('createBook', array($bookArray));
                 }
                 $result = $response->message;
 
@@ -55,10 +46,9 @@ switch ($doAction) {
                     foreach ($authorArrayIds as $author_id) {
                         $bookAuthorArray['book_id'] = $response->last_insert_id;
                         $bookAuthorArray['author_id'] = $author_id;
-                        $soapClient->__soapCall('create', array($bookAuthorArray, 'authors_books'));
+                        $soapClient->__soapCall('createBook', array($bookAuthorArray, 'authors_books'));
                     }
                 }
-
             } catch (Exception $e) {
                 print_r($soapClient->__getLastResponse());
             }
@@ -76,7 +66,6 @@ try {
     }
     $authorList = $soapClient->__soapCall('getAuthors', array());
     $publisherList = $soapClient->__soapCall('getPublisher', array());
-    //print_r($list);
 } catch (Exception $e) {
     print_r($e->getMessage());
     print_r($soapClient->__getLastResponse());

@@ -1,17 +1,8 @@
 <?php
-include '../../config.php';
 
-class Author
+class Author extends Publisher
 {
-    private $_db,
-            $_data;
-
-    public function __construct()
-    {
-        $this->_db = Db::getInstance();
-    }
-
-    public function create($fields)
+    public function createAuthor($fields)
     {
         if (!$this->_db->insert('author', $fields)) {
             throw new Exception('Autorul nu a fost introdus !');
@@ -19,7 +10,7 @@ class Author
         return 'Autorul a fost adaugat cu succes !';
     }
 
-    public function delete($fields)
+    public function deleteAuthor($fields)
     {
         if (!$this->_db->delete('author', $fields)) {
             throw new Exception('Autorul nu a putut fi sters sau nu exista !');
@@ -27,7 +18,7 @@ class Author
         return 'Autorul a fost sters';
     }
 
-    public function update($fields = array(), $id = null)
+    public function updateAuthor($fields = array(), $id = null)
     {
         if (is_int($id)) {
             if (!$this->_db->update('author', $id, $fields)) {
@@ -56,17 +47,7 @@ class Author
         return false;
     }
 
-    public function soapLogin($headerParamas = null)
-    {
-        if ($headerParamas->username == SOAP_USERNAME && $headerParamas->password == SOAP_PASSWORD) {
-            return true;
-        }
-        throw new SoapFault('Wrong username/password ', 401);
+    public function deleteAuthorsBooks($id) {
+        $this->_db->delete('authors_books', array('book_id', '=', $id));
     }
 }
-
-$params = ['uri' => 'http://localhost/bookstore/includes/classes/Author.php'];
-$server = new SoapServer(null, $params);
-$server->setClass('Author');
-$server->addSoapHeader();
-$server->handle();
