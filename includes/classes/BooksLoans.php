@@ -40,6 +40,9 @@ class BooksLoans extends Books
             . " where 1"
             . ($filters->author ? " and a.id = '" . $filters->author . "'" : '')
             . ($filters->id ? " and bl.id = '" . $filters->id . "'" : '')
+            . ($filters->book_id ? " and b.id = '" . $filters->book_id . "'" : '')
+            . ($filters->loanExceeded === true ? " and bl.return_date <= CURDATE()" : '')
+            . ($filters->loanExceeded === false ? " and bl.return_date >= CURDATE()" : '')
             . " group by bl.id order by bl.return_date asc";
 
         $data = $this->_db->query($sql);

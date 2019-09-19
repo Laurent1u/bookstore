@@ -6,6 +6,8 @@ $bookId = $requestParam->_int('book_id');
 $loanBookId = $requestParam->_int('loan_book_id');
 $loanPublisherId = $requestParam->_int('loan_publisher_id');
 $loanId = $requestParam->_int('loan_id');
+$loanExceeded = $requestParam->_bool('loan_exceeded');
+$loanBookFilterId = $requestParam->_int('loan_book_filter_id');
 
 switch ($doAction) {
     case 'save':
@@ -46,8 +48,8 @@ try {
     $key = array_search($loanBookId, array_column($booksList ?: [], 'id'));
     $wherePublisher = $loanBookId ? ['id', '=', $booksList[$key]->publisher_id] : [];
     $publisherList = $soapClient->__soapCall('getPublisher', array($wherePublisher));
-    //var_dump($booksList, $_REQUEST);
-    $bookLoansList = $soapClient->__soapCall('getBookLoans', array());
+
+    $bookLoansList = $soapClient->__soapCall('getBookLoans', array((object)['loanExceeded' => $loanExceeded, 'book_id' => $loanBookFilterId]));
     if ($loanId) {
         $booksList = $soapClient->__soapCall('getBookLoans', array((object)['id' => $loanId]));
     }

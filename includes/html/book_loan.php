@@ -39,7 +39,7 @@
             <?php } else { ?>
             <div class="form-group col-sm-6">
                 <label for="loan_book_id">Carti:</label>
-                <select name="loan_book_id" id="loan_book_id" class="custom-select custom-select-sm" onchange="this.form.submit();">
+                <select name="loan_book_id" id="loan_book_id" class="custom-select custom-select-sm" onchange="submitForm(this.form, false);">
                     <option value="">Tot</option>
                     <?php foreach ($booksList as $book) { ?>
                         <option value="<?php echo $book->id ?>" <?php if ($loanBookId == $book->id) { echo ' selected';} ?>><?php echo $book->name; ?></option>
@@ -48,7 +48,7 @@
             </div>
                 <div class="form-group col-sm-6">
                     <label for="loan_publisher_id">Editura:</label>
-                    <select name="loan_publisher_id" id="loan_publisher_id" class="custom-select custom-select-sm" onchange="this.form.submit();">
+                    <select name="loan_publisher_id" id="loan_publisher_id" class="custom-select custom-select-sm" onchange="submitForm(this.form, false);">
                         <option value="">Tot</option>
                         <?php foreach ($publisherList as $publisher) { ?>
                             <option value="<?php echo $publisher->id ?>" <?php if ($loanPublisherId == $publisher->id) { echo ' selected';} ?>><?php echo $publisher->name; ?></option>
@@ -76,17 +76,17 @@
     </div>
 </div>
 
-<form action="?p=book_loan" method="get" id="searchForm">
+<form action="?p=book_loan" method="post" id="searchForm">
     <table class="table">
         <thead>
             <tr>
                 <th colspan="6">
                     <div class="form-group">
-                        <label for="loan_book">Carti Imprumutate:</label>
-                        <select name="loan_book" id="loan_book" class="custom-select custom-select-sm">
+                        <label for="loan_book_filter_id">Carti Imprumutate:</label>
+                        <select name="loan_book_filter_id" id="loan_book_filter_id" class="custom-select custom-select-sm">
                             <option value="">Tot</option>
                             <?php foreach ($takenBooks as $book) { ?>
-                                <option value="<?php echo $book->id ?>"><?php echo $book->name; ?></option>
+                                <option value="<?php echo $book->id ?>" <?php echo ($loanBookFilterId == $book->id ? ' selected' : ''); ?>><?php echo $book->name; ?></option>
                             <?php } ?>
                         </select>
                     </div>
@@ -96,12 +96,14 @@
                         <label for="loan_exceeded">Termen Depasit:</label>
                         <select name="loan_exceeded" id="loan_exceeded" class="custom-select custom-select-sm">
                             <option value="">Tot</option>
+                            <option value="1" <?php echo $loanExceeded === true ? ' selected': ''; ?>>Da</option>
+                            <option value="0" <?php echo $loanExceeded === false ? ' selected': ''; ?>>Nu</option>
                         </select>
                     </div>
                 </th>
                 <th>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-secondary btn-sm">Cauta</button>
+                        <button class="btn btn-secondary btn-sm" onclick="submitForm(this.form, false);">Cauta</button>
                     </div>
                 </th>
             </tr>
@@ -142,17 +144,16 @@
 </form>
 <script type="text/javascript">
     window.onload = function () {
-        $('form').submit(function (e) {
+        $('#saveForm').submit(function (e) {
             e.preventDefault();
             message = [];
 
-            let validate = false;
-            let submitForm = true;
             let loanBookId = $('#loan_book_id');
             let loanPublisherId = $('#loan_publisher_id');
             let clientName = $('#name');
             let clientSurname = $('#surname');
             let daysLoan = $('#loan_days');
+            let validate = {message: 0};
 
             if (this.id === 'saveForm') {
                 let requiredFields = [clientName, clientSurname, daysLoan];
@@ -163,28 +164,23 @@
                 requiredFields.forEach((field, index)=> {
                     let labelIdentifier = $('label[for="' + field[0].id + '"]').html();
                     validate = validateEmptyInput(field, labelIdentifier);
-                    if (validate.isValid) {
-                        submitForm = false;
-                    }
                 });
-                console.log(requiredFields);
 
-
-                this.elements['doAction'].value = 'save';
             }
-            if (!submitForm) {
+
+            if (validate.message.length) {
                 alert(validate.message.join().replace(/,/gi, ''));
                 return false;
             }
-            
-            return false;
+
             submitForm(this);
         });
+    };
 
-        function submitForm(formData, send = true) {
-            if (send) {
-              formData.submit();
-            }
+    function submitForm(formData, save = true) {
+        if (save) {
+            formData.elements['doAction'].value = 'save';
         }
+        formData.submit();
     }
 </script>
