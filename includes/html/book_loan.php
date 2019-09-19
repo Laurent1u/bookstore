@@ -10,6 +10,7 @@
             <input type="hidden" name="doAction" value="">
             <input type="hidden" name="book_id" value="<?php echo $bookId; ?>">
             <input type="hidden" name="loan_id" value="<?php echo $loanId; ?>">
+            <input type="hidden" name="client_id" value="<?php echo $booksList[0]->client_id; ?>">
 
             <?php if ($bookId || $loanId) { ?>
                 <div class="form-group input-group-sm col-sm-4">
@@ -122,7 +123,7 @@
             <?php foreach ($bookLoansList as $loan) { ?>
                 <tr>
                     <th scope="row"><?php echo $loan->id; ?></th>
-                    <th><?php echo $loan->name; ?></th>
+                    <td><?php echo $loan->name; ?></td>
                     <td><?php echo $loan->surname; ?></td>
                     <td><?php echo $loan->book_name; ?></td>
                     <td><?php echo $loan->publisher; ?></td>

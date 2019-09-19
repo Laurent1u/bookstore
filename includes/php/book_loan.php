@@ -8,19 +8,27 @@ $loanPublisherId = $requestParam->_int('loan_publisher_id');
 $loanId = $requestParam->_int('loan_id');
 $loanExceeded = $requestParam->_bool('loan_exceeded');
 $loanBookFilterId = $requestParam->_int('loan_book_filter_id');
+$clientId = $requestParam->_int('client_id');
 
 switch ($doAction) {
     case 'save':
-        $loanArray = array(
+        $client = new Clients();
+        $clientArray = array(
             'name' => $name,
-            'surname' => $surname,
+            'surname' => $surname
+        );
+
+        $loanArray = array(
             'days_loan' => $loanDays,
             'return_date' => date('Y-m-d', strtotime($loanDays . 'days'))
         );
 
         if ($loanId) {
+            $client->updateClient($clientArray, $clientId);
             $soapClient->__soapCall('updateLoan', array($loanArray, $loanId));
         } else {
+            $clientInfo = $client->createClient($clientArray);
+            $loanArray['client_id'] = $clientInfo->last_insert_id;
             $loanArray['book_id'] = $bookId ?: $loanBookId;
             $soapClient->__soapCall('createLoan', array($loanArray));
 

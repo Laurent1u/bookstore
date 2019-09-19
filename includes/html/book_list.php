@@ -88,8 +88,12 @@
             }
         }
         ?>
-
     </div>
+    <?php if (!$results) { ?>
+        <div class="col-sm-10">
+            <p class="text-center">Nu exista rezultate !</p>
+        </div>
+    <?php } ?>
 </div>
 <script type="text/javascript">
     window.onload = function () {

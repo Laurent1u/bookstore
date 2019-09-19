@@ -31,12 +31,13 @@ class BooksLoans extends Books
     public function getBookLoans($filters = array())
     {
         $sql = "select bl.*, b.name as book_name, p.name as publisher, a.name as authors_name, "
-            . " b.appearance_date, b.page_number, b.bar_code"
+            . " b.appearance_date, b.page_number, b.bar_code, c.name, c.surname"
             . " from book_loans bl"
             . " inner join books b on b.id = bl.book_id"
             . " inner join publishers p on p.id = b.publisher_id"
             . " inner join authors_books ab on ab.book_id = bl.book_id"
             . " inner join author a on a.id = ab.author_id"
+            . " inner join clients c on c.id = bl.client_id"
             . " where 1"
             . ($filters->author ? " and a.id = '" . $filters->author . "'" : '')
             . ($filters->id ? " and bl.id = '" . $filters->id . "'" : '')
